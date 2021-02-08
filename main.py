@@ -45,8 +45,10 @@ async def make_tim(ctx: commands.Context, *extra_players, number_of_teams=2, voi
     users = random.sample(users, len(users))
 
     if len(users) < 2:
-        msg = f'Tim can only see {len(users)} in the channel {voice_channel.name}. If you are more than that in ' \
-              f'the voice channel, then leaving and joining again is likely to fix it!'
+        msg = """
+            I, Tim, can only see {N_USERS} in the voice channel {VOICE_CHN_NAME}. If you are more than that in the voice 
+            channel, then leaving and joining again is likely to fix it!
+            """.format(N_USERS=len(users), VOICE_CHN_NAME=voice_channel.name)
         await ctx.channel.send(msg)
         return
 
@@ -58,8 +60,8 @@ async def make_tim(ctx: commands.Context, *extra_players, number_of_teams=2, voi
     team_name_adjectives = random.sample(TEAM_NAME_ADJECTIVES, number_of_teams)
     team_name_animals = random.sample(TEAM_NAME_ANIMALS, number_of_teams)
     for i, team in enumerate(teams):
-        msg += f'The {team_name_adjectives[i]} {team_name_animals[i]} \n'
-        msg += f"""\t {str(team).strip("[]").replace("'", '')}\n"""
+        msg += 'The {ADJECTIVE} {ANIMAL} \n'.format(ADJECTIVE=team_name_adjectives[i], ANIMAL=team_name_animals[i])
+        msg += '\t {TEAM_MEMBERS}\n'.format(TEAM_MEMBERS=str(team).strip("[]").replace("'", ''))
     msg += 'GL HF!'
 
     await ctx.channel.send(msg)
