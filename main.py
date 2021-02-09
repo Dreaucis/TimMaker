@@ -1,6 +1,7 @@
 import random
 import os
 
+from pathlib import Path
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix='$')
@@ -67,9 +68,9 @@ async def make_tim(ctx: commands.Context, *extra_players, number_of_teams=2, voi
     await ctx.channel.send(msg)
 
 
-def get_token_from_file(file: str):
-    with open(file) as f:
+def get_token_from_file(file: Path):
+    with file.open() as f:
         return f.read().split('=')[1]
 
 
-bot.run(os.getenv('TOKEN') or get_token_from_file('.env'))
+bot.run(os.getenv('TOKEN') or get_token_from_file(Path(__file__).parent / '.env'))
