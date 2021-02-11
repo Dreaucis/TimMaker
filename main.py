@@ -91,22 +91,22 @@ async def make_tim(ctx: commands.Context, *extra_players, number_of_teams=2, voi
 async def pick_hero(ctx: commands.Context):
     """ Recommends a hero """
     heroes = get_hero_list()
-    hero = random.sample(heroes)
+    hero = random.choice(heroes)
     sentences = [
-        "Hmmm.. You should play...{hero} !",
+        "Hmmm.. You should play...{HERO} !",
         "Maybe {HERO}?",
         "Definitely {HERO}! No doubt about it",
         "I'd say Armadon! Wait, wrong game, go {HERO} instead!",
         "Only {HERO} would make sense, no?",
-        "Either {HERO} or {HERO} or {HERO}",
+        "Either {HERO} or... {HERO} or maybe {HERO}?",
         "{HERO} would be great for you!",
         "What about... {HERO}!",
         "{HERO} would be a certain win!",
         "First pick {HERO}! Bam!"
     ]
-    sentences = [s.format(hero=hero) for s in heroes]
-    msg = random.sample(sentences)
+    sentences = [s.format(HERO=hero) for s in sentences]
+    msg = random.choice(sentences)
 
-    ctx.channel.send(msg)
+    await ctx.channel.send(msg)
 
 bot.run(os.getenv('TOKEN') or get_token_from_file(Path(__file__).parent / '.env'))
