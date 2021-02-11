@@ -2,6 +2,9 @@ import random
 import os
 
 from pathlib import Path
+from functools import lru_cache
+
+import requests
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix='$')
@@ -38,6 +41,21 @@ TEAM_NAME_ANIMALS = [
 ]
 
 
+@lru_cache(maxsize=128)
+def get_hero_list():
+    r = requests.get('http://hotsapi.net/api/v1/heroes')
+    heroes = [h['name'] for h in r.json()]
+
+    # Urgh, the API did not give a complete list
+    heroes = heroes + ['Deathwing', 'Mei', 'Hogger']
+    return heroes
+
+
+def get_token_from_file(file: Path):
+    with file.open() as f:
+        return f.read().split('=')[1]
+
+
 @bot.command()
 async def make_tim(ctx: commands.Context, *extra_players, number_of_teams=2, voice_channel_nr=0):
     """ Divides the users in the channel into teams """
@@ -68,9 +86,26 @@ async def make_tim(ctx: commands.Context, *extra_players, number_of_teams=2, voi
     await ctx.channel.send(msg)
 
 
-def get_token_from_file(file: Path):
-    with file.open() as f:
-        return f.read().split('=')[1]
+@bot.command()
+async def pick_hero(ctx: commands.Context):
+    """ Recommends a hero """
+    heroes = get_hero_list()
+    hero = random.sample(heroes)
+    sentences = [
+        "Hmmm.. You should play...{hero} !",
+        "Maybe {HERO}?",
+        "Definitely {HERO}! No doubt about it",
+        "I'd say Armadon! Wait, wrong game, go {HERO} instead!",
+        "Only {HERO} would make sense, no?",
+        "Either {HERO} or {HERO} or {HERO}",
+        "{HERO} would be great for you!",
+        "What about... {HERO}!",
+        "{HERO} would be a certain win!",
+        "First pick {HERO}! Bam!"
+    ]
+    sentences = [s.format(hero=hero) for s in heroes]
+    msg = random.sample(sentences)
 
+    ctx.channel.send(msg)
 
 bot.run(os.getenv('TOKEN') or get_token_from_file(Path(__file__).parent / '.env'))
