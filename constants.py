@@ -12,23 +12,23 @@ SUGGEST_TEAM_ADJECTIVES = [
     'Euphoric',
     'Jubilant',
     'Cool',
-    'Smart'
+    'Smart',
 ]
 
 SUGGEST_TEAM_ANIMALS = [
     'Moose (Meese? Mooses?) :thinking:',
-    'Ducks',
-    'Tigers',
-    'Elephants',
-    'Silverfishes',
-    'Cats',
-    'Penguins',
-    'Squirrels',
-    'Hedgehogs',
-    'Dogs',
-    'Pandas',
-    'Rabbits',
-    'Donkeys'
+    'Ducks :duck:',
+    'Tigers :tiger:',
+    'Elephants :elephant:',
+    'Silverfishes :bug::heavy_plus_sign::fish:',
+    'Cats :smile_cat:',
+    'Penguins :penguin:',
+    'Squirrels :chipmunk:',
+    'Shrimps :shrimp:',
+    'Dogs :dog:',
+    'Pandas :panda_face_',
+    'Rabbits :rabbit:',
+    'Otters :otter:',
 ]
 
 SUGGEST_HERO_SENTENCES = [
@@ -41,7 +41,7 @@ SUGGEST_HERO_SENTENCES = [
     "{HERO} would be great for you!",
     "What about... {HERO}!",
     "{HERO} would be a certain win!",
-    "First pick {HERO}! Bam!"
+    "First pick {HERO}! Bam!",
 ]
 
 HERO_ROLES = [
@@ -50,6 +50,6 @@ HERO_ROLES = [
     'bruiser',
     'tank',
     'melee assassin',
-    'ranged assassin'
+    'ranged assassin',
 ]
 
