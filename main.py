@@ -4,58 +4,28 @@ import os
 
 from pathlib import Path
 from functools import lru_cache
-from typing import Optional, Tuple
+from typing import Optional, List
 
 import requests
 from discord.ext import commands
+from constants import MSG_DELETION_TIME, SUGGEST_HERO_SENTENCES, SUGGEST_TEAM_ADJECTIVES, SUGGEST_TEAM_ANIMALS, \
+    HERO_ROLES
 
 bot = commands.Bot(command_prefix='$')
 
-TEAM_NAME_ADJECTIVES = [
-    'Electrifying',
-    'Exhilarating',
-    'Delightful',
-    'Sensational',
-    'Animating',
-    'Stimulating',
-    'Vitalizing',
-    'Overjoyed',
-    'Euphoric',
-    'Jubilant',
-    'Cool',
-    'Smart'
-]
-
-TEAM_NAME_ANIMALS = [
-    'Moose (Meese? Mooses?) :thinking:',
-    'Ducks',
-    'Tigers',
-    'Elephants',
-    'Silverfishes',
-    'Cats',
-    'Penguins',
-    'Squirrels',
-    'Hedgehogs',
-    'Dogs',
-    'Pandas',
-    'Rabbits',
-    'Donkeys'
-]
-
-HERO_ROLES = [
-    'support',
-    'healer',
-    'bruiser',
-    'tank',
-    'melee assassin',
-    'ranged assassin'
-]
-
-MSG_DELETION_TIME = 15.0  # How long until the messages are deleted. Avoids spam!
-
 
 @lru_cache(maxsize=128)
-def get_hero_list(role: str = None):
+def get_hero_list(role: Optional[str] = None) -> List[str]:
+    """
+    Queries the HeroesProfile open API for a list of heroes. Returns a list of hero names.
+
+    Args:
+         role: Optional; Limit the query by specifying what role the hero should have
+
+    Returns:
+        A list of hero names.
+
+    """
     if role:
         r = requests.get('https://api.heroesprofile.com/openApi/Heroes', {'role': role})
     else:
@@ -63,7 +33,8 @@ def get_hero_list(role: str = None):
     return list(r.json())
 
 
-def get_token_from_file(file: Path):
+def get_token_from_file(file: Path) -> str:
+    """ Naively parse a file for a token. Expects the format to be <TOKEN_NAME>=<TOKEN>."""
     with file.open() as f:
         return f.read().split('=')[1]
 
@@ -78,27 +49,32 @@ async def suggest_teams(ctx: commands.Context, *extra_players: str):
         $suggest_teams
         $suggest_teams Player1 Player2
     """
-    number_of_teams = 2
-    voice_channel_nr = 0
+    number_of_teams = 2  # The number of teams
+    voice_channel_nr = 0  # The voice channel to find users in. 0 is the first top to down in Discord
+
+    # Collect users in voice and args
     voice_channel = ctx.guild.voice_channels[voice_channel_nr]
     users = [m.name for m in voice_channel.members] + list(extra_players)
-    users = random.sample(users, len(users))
+    users = random.sample(users, len(users))  # Shuffle to ensure different teams
 
+    # If there's are less than two users, then no teams can be constructed. Inform user and return.
     if len(users) < 2:
-        msg = """
-            I, Tim, can only see {N_USERS} in the voice channel {VOICE_CHN_NAME}. If you are more than that in the voice 
-            channel, then leaving and joining again is likely to fix it!
-            """.format(N_USERS=len(users), VOICE_CHN_NAME=voice_channel.name)
+        msg = (
+            "I, Tim, can only see {N_USERS} in the voice channel {VOICE_CHL_NAME}." 
+            "If you are more than that in the voice channel, then leaving and joining again is likely to fix it!"
+        ).format(N_USERS=len(users), VOICE_CHL_NAME=voice_channel.name)
         await ctx.channel.send(msg, delete_after=MSG_DELETION_TIME)
         return
 
-    teams = [[] for i in range(number_of_teams)]
+    # Assign users to teams
+    teams = [[] for _ in range(number_of_teams)]
     for i, user in enumerate(users):
         teams[i % number_of_teams].append(user)
 
-    msg = 'I, Tim, made these tims!:\n'
-    team_name_adjectives = random.sample(TEAM_NAME_ADJECTIVES, number_of_teams)
-    team_name_animals = random.sample(TEAM_NAME_ANIMALS, number_of_teams)
+    # Construct reply
+    msg = 'I, Tim, suggest these teams!:\n'
+    team_name_adjectives = random.sample(SUGGEST_TEAM_ADJECTIVES, number_of_teams)
+    team_name_animals = random.sample(SUGGEST_TEAM_ANIMALS, number_of_teams)
     for i, team in enumerate(teams):
         msg += 'The {ADJECTIVE} {ANIMAL} \n'.format(ADJECTIVE=team_name_adjectives[i], ANIMAL=team_name_animals[i])
         msg += '\t {TEAM_MEMBERS}\n'.format(TEAM_MEMBERS=str(team).strip("[]").replace("'", ''))
@@ -124,31 +100,26 @@ async def suggest_hero(ctx: commands.Context, *, role: Optional[str] = None):
         $suggest_hero
         $suggest_hero Bruiser
     """
+    # If a role was specified but not found, inform the user and return
     if role and role.lower() not in HERO_ROLES:
         msg = (
-            'Tim could not find any heroes with the role {ROLE}'
-            'Valid roles are {ROLES}.'
+            'Tim could not find any heroes with the role {ROLE}. '
+            'Valid roles include: {ROLES}.'
         ).format(ROLE=role, ROLES=', '.join(HERO_ROLES))
 
         await ctx.channel.send(msg, delete_after=MSG_DELETION_TIME)
+        return
+
+    # Pick a random hero
     heroes = get_hero_list(role)
     hero = random.choice(heroes)
-    sentences = [
-        "Hmmm.. You should play...{HERO} !",
-        "Maybe {HERO}?",
-        "Definitely {HERO}! No doubt about it",
-        "I'd say Armadon! Wait, wrong game, go {HERO} instead!",
-        "Only {HERO} would make sense, no?",
-        "Either {HERO} or... {HERO} or maybe {HERO}?",
-        "{HERO} would be great for you!",
-        "What about... {HERO}!",
-        "{HERO} would be a certain win!",
-        "First pick {HERO}! Bam!"
-    ]
-    sentences = [s.format(HERO=hero) for s in sentences]
+
+    # Construct reply
+    sentences = [s.format(HERO=hero) for s in SUGGEST_HERO_SENTENCES]
     msg = random.choice(sentences)
 
     await ctx.channel.send(msg, delete_after=MSG_DELETION_TIME)
 
 
-bot.run(os.getenv('TOKEN') or get_token_from_file(Path(__file__).parent / '.env'))
+if __name__ == '__main__':
+    bot.run(os.getenv('TOKEN') or get_token_from_file(Path(__file__).parent / '.env'))
