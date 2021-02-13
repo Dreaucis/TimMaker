@@ -1,4 +1,4 @@
-MSG_DELETION_TIME = 15.0  # How long until the messages are deleted. Avoids spam!
+MSG_DELETION_TIME = 30.0  # How long until the messages are deleted. Avoids spam!
 
 SUGGEST_TEAM_ADJECTIVES = [
     ':cloud_lightning: Electrifying',
@@ -26,7 +26,7 @@ SUGGEST_TEAM_ANIMALS = [
     'Squirrels :chipmunk:',
     'Shrimps :shrimp:',
     'Dogs :dog:',
-    'Pandas :panda_face_',
+    'Pandas :panda_face:',
     'Rabbits :rabbit:',
     'Otters :otter:',
 ]

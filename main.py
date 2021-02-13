@@ -60,7 +60,7 @@ async def suggest_teams(ctx: commands.Context, *extra_players: str):
     # If there's are less than two users, then no teams can be constructed. Inform user and return.
     if len(users) < 2:
         msg = (
-            "I, Tim, can only see {N_USERS} in the voice channel {VOICE_CHL_NAME}." 
+            "I, Tim, can only see {N_USERS} in the voice channel {VOICE_CHL_NAME}. " 
             "If you are more than that in the voice channel, then leaving and joining again is likely to fix it!"
         ).format(N_USERS=len(users), VOICE_CHL_NAME=voice_channel.name)
         await ctx.channel.send(msg, delete_after=MSG_DELETION_TIME)
@@ -103,7 +103,7 @@ async def suggest_hero(ctx: commands.Context, *, role: Optional[str] = None):
     # If a role was specified but not found, inform the user and return
     if role and role.lower() not in HERO_ROLES:
         msg = (
-            'Tim could not find any heroes with the role {ROLE}. '
+            'Tim could not find any heroes with the role {ROLE}.\n'
             'Valid roles include: {ROLES}.'
         ).format(ROLE=role, ROLES=', '.join(HERO_ROLES))
 
