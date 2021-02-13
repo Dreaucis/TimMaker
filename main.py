@@ -4,7 +4,7 @@ import os
 
 from pathlib import Path
 from functools import lru_cache
-from typing import Optional
+from typing import Optional, Tuple
 
 import requests
 from discord.ext import commands
@@ -69,8 +69,15 @@ def get_token_from_file(file: Path):
 
 
 @bot.command()
-async def suggest_teams(ctx: commands.Context, *extra_players):
-    """ Divides the users in the channel into teams """
+async def suggest_teams(ctx: commands.Context, *extra_players: str):
+    """
+    Randomly divides users in the first voice channel into teams. Additional users can be added by typing their names
+    separated by spaces.
+
+    Example:
+        $suggest_teams
+        $suggest_teams Player1 Player2
+    """
     number_of_teams = 2
     voice_channel_nr = 0
     voice_channel = ctx.guild.voice_channels[voice_channel_nr]
@@ -102,7 +109,21 @@ async def suggest_teams(ctx: commands.Context, *extra_players):
 
 @bot.command()
 async def suggest_hero(ctx: commands.Context, *, role: Optional[str] = None):
-    """ Recommends a hero """
+    """ 
+    Randomly suggests a hero. The suggestions can be further specified down by role.
+    
+    Available roles include:
+        Support
+        Healer
+        Bruiser
+        Tank
+        Melee assassin
+        Ranged assassin
+
+    Example:
+        $suggest_hero
+        $suggest_hero Bruiser
+    """
     if role and role.lower() not in HERO_ROLES:
         msg = (
             'Tim could not find any heroes with the role {ROLE}'
