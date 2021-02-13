@@ -69,8 +69,10 @@ def get_token_from_file(file: Path):
 
 
 @bot.command()
-async def make_tim(ctx: commands.Context, *extra_players, number_of_teams=2, voice_channel_nr=0):
+async def suggest_teams(ctx: commands.Context, *extra_players):
     """ Divides the users in the channel into teams """
+    number_of_teams = 2
+    voice_channel_nr = 0
     voice_channel = ctx.guild.voice_channels[voice_channel_nr]
     users = [m.name for m in voice_channel.members] + list(extra_players)
     users = random.sample(users, len(users))
