@@ -105,9 +105,9 @@ async def suggest_teams(ctx: commands.Context, *extra_players: str):
     redo_emoji = '🔄'
     await message.add_reaction(redo_emoji)
 
-    # Wait for any redraft to be requested, if any are requested. Redraft the teams and print the new teams.
+    # Loop for continuous redrafting
     while True:
-        # Wait for the redraft emoji reaction. If none is given after <MSG_DELETION_TIME> sec delete message and return.
+        # Wait for the redraft emoji reaction. If none is given after <MSG_DELETION_TIME> sec delete message and return
         try:
             reaction, user = await bot.wait_for(
                 'reaction_add',
