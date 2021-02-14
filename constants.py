@@ -1,4 +1,4 @@
-MSG_DELETION_TIME = 30.0  # How long until the messages are deleted. Avoids spam!
+MSG_DELETION_TIME = 120.0  # How long until the messages are deleted. Avoids spam!
 
 SUGGEST_TEAM_ADJECTIVES = [
     ':cloud_lightning: Electrifying',
