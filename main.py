@@ -33,6 +33,7 @@ def get_hero_list(role: Optional[str] = None) -> List[str]:
         r = requests.get('https://api.heroesprofile.com/openApi/Heroes')
     return list(r.json())
 
+
 def get_token_from_file(file: Path) -> str:
     """ Naively parse a file for a token. Expects the format to be <TOKEN_NAME>=<TOKEN>."""
     with file.open() as f:
@@ -115,7 +116,7 @@ async def suggest_teams(ctx: commands.Context, *extra_players: str):
             reaction, user = await bot.wait_for(
                 'reaction_add',
                 timeout=MSG_DELETION_TIME,
-                check=lambda r, u:  str(r.emoji) == redo_emoji and u != message.author
+                check=lambda r, u: str(r.emoji) == redo_emoji and u != message.author
             )
         except TimeoutError:
             await message.delete()
