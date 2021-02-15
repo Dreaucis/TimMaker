@@ -33,7 +33,6 @@ def get_hero_list(role: Optional[str] = None) -> List[str]:
         r = requests.get('https://api.heroesprofile.com/openApi/Heroes')
     return list(r.json())
 
-
 def get_token_from_file(file: Path) -> str:
     """ Naively parse a file for a token. Expects the format to be <TOKEN_NAME>=<TOKEN>."""
     with file.open() as f:
@@ -62,8 +61,8 @@ def construct_suggest_team_reply(teams: List[List[str]], adjectives: List[str], 
 @bot.command()
 async def suggest_teams(ctx: commands.Context, *extra_players: str):
     """
-    Randomly divides users in the first voice channel into teams. Additional users can be added by typing their names
-    separated by spaces.
+    Randomly divides users in the callers voice channel into teams. If the author is not in a voice channel, it
+    defaults to the first one. Additional users can be added by typing their names separated by spaces.
 
     Buttons:
         🔄: Redraft the teams
@@ -73,10 +72,14 @@ async def suggest_teams(ctx: commands.Context, *extra_players: str):
         $suggest_teams Player1 Player2
     """
     number_of_teams = 2  # The number of teams
-    voice_channel_nr = 0  # The voice channel to find users in. 0 is the first top to down in Discord
+
+    # Find the authors voice channel, else default to the first voice channel
+    voice_channel = next(
+        (vc for vc in ctx.guild.voice_channels if ctx.message.author in vc.members),
+        ctx.guild.voice_channels[0]
+    )
 
     # Collect users in voice and args
-    voice_channel = ctx.guild.voice_channels[voice_channel_nr]
     users = [m.name for m in voice_channel.members] + list(extra_players)
 
     # If there's are less than two users, then no teams can be constructed. Inform user and return.
